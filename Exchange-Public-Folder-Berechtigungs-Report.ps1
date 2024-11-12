@@ -1,4 +1,20 @@
-﻿# Exchange Public Folder Permission Analysis Script
+﻿<#
+.SYNOPSIS
+    Erstellt einen Bericht über die Berechtigungen von Exchange-Postfächern.
+.DESCRIPTION
+    Dieses PowerShell-Skript sammelt Postfachberechtigungen (Postfachzugriffsrechte, "Send-As" und "Send on Behalf") für alle Benutzer- und freigegebene Postfächer in einem Exchange-Server und erstellt einen HTML-Report.
+    
+.EXAMPLE
+    PS> .\ExchangePermissionsReport.ps1
+    (Erstellt einen Bericht über die Berechtigungen und speichert ihn als HTML-Datei.)
+
+.LINK
+    https://github.com/chris-20/ExchangePermissionsReport
+
+.NOTES
+    Lizenz: MIT
+    
+# Exchange Public Folder Permission Analysis Script
 # Requires Exchange Management Shell
 
 # Hole das Verzeichnis, in dem das Skript liegt
