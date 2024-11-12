@@ -20,7 +20,7 @@ Dieses PowerShell-Skript erstellt einen detaillierten Berechtigungsbericht für 
 2. Öffne die **Exchange Management Shell**.
 3. Navigiere in das Verzeichnis, in dem sich das Skript befindet.
 4. Gib folgenden Befehl ein, um das Skript auszuführen:  
-   `powershell -ExecutionPolicy Bypass -File .\Exchange-Berechtigungen-Report.ps1`
+   `powershell -ExecutionPolicy Bypass -File .\Update Exchange-Public-Folder-Berechtigungs-Report.ps1`
 5. Der Bericht wird als HTML-Datei im gleichen Verzeichnis gespeichert und enthält einen Zeitstempel im Dateinamen.
 
 📘 **Beispielausgabe**
