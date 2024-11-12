@@ -1,4 +1,4 @@
-📊 **Exchange Public Folder Berechtigungs-Report**
+📊 **Exchange On-Premise Public Folder Berechtigungs-Report**
 
 Dieses PowerShell-Skript erstellt einen detaillierten Berechtigungsbericht für öffentliche Ordner auf einem Exchange-Server. Es erfasst die Zugriffsrechte der Benutzer auf die öffentlichen Ordner und stellt sie in einem übersichtlichen HTML-Bericht dar. Der Report hilft, Zugriffsberechtigungen zu überprüfen, Sicherheitsrichtlinien einzuhalten und eine klare Übersicht zu behalten.
 
