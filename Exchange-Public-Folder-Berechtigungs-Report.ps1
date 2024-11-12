@@ -13,6 +13,7 @@
 
 .NOTES
     Lizenz: MIT
+    Version: 1.0
 #>
     
 # Exchange Public Folder Permission Analysis Script
@@ -27,10 +28,16 @@ param(
 # Setze Ausgabepfad
 if ([string]::IsNullOrEmpty($OutputPath)) {
     $scriptPath = Split-Path -Parent $MyInvocation.MyCommand.Path
-    $reportPath = Join-Path $scriptPath "PublicFolderPermissions_$(Get-Date -Format 'yyyyMMdd_HHmmss').html"
+    $timestamp = Get-Date -Format "dd.MM.yyyy HH-mm"
+    $reportPath = Join-Path $scriptPath "Public_Folder_Permissions_Report_$timestamp.html"
 } else {
     $reportPath = $OutputPath
 }
+
+# Setze Encoding für korrekte Umlaut-Darstellung
+$OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
 
 $progressPreference = 'Continue'
 
