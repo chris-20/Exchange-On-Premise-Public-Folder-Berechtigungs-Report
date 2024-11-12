@@ -11,7 +11,7 @@ Dieses PowerShell-Skript erstellt einen detaillierten Berechtigungsbericht für 
 
 📋 **Voraussetzungen**
 
-- PowerShell-Zugriff auf den Exchange Server
+- Zugriff auf den Exchange Server
 - **Exchange Management Shell** zur Ausführung des Skripts
 
 🚀 **Verwendung**
