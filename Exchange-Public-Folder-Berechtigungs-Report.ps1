@@ -9,7 +9,7 @@
     (Erstellt einen Bericht über die Berechtigungen und speichert ihn als HTML-Datei.)
 
 .LINK
-    https://github.com/chris-20/Exchange-Public-Folder-Berechtigungs-Report
+    https://github.com/chris-20/Exchange-On-Premise-Public-Folder-Berechtigungs-Report
 
 .NOTES
     Lizenz: MIT
