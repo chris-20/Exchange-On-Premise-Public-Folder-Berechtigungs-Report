@@ -1,4 +1,4 @@
-﻿<#
+<#
 .SYNOPSIS
     Erstellt einen Bericht über die Berechtigungen von Exchange-Postfächern.
 .DESCRIPTION
@@ -13,6 +13,7 @@
 
 .NOTES
     Lizenz: MIT
+#>
     
 # Exchange Public Folder Permission Analysis Script
 # Requires Exchange Management Shell
