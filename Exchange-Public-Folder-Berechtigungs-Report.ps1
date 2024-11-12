@@ -15,15 +15,21 @@
     Lizenz: MIT
     Version: 1.0
 #>
-    
+
 # Exchange Public Folder Permission Analysis Script
-# Requires Exchange Management Shell
-# Hole das Verzeichnis, in dem das Skript liegt
 [CmdletBinding()]
 param(
     [string]$OutputPath = "",
     [switch]$IncludeDefaultPermissions
 )
+
+# Setze Encoding für korrekte Umlaut-Darstellung
+$OutputEncoding = [System.Text.Encoding]::UTF8
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
+
+# BOM (Byte Order Mark) für UTF-8 hinzufügen
+$BOM = [System.Text.UTF8Encoding]::new($true)
 
 # Setze Ausgabepfad
 if ([string]::IsNullOrEmpty($OutputPath)) {
@@ -34,26 +40,18 @@ if ([string]::IsNullOrEmpty($OutputPath)) {
     $reportPath = $OutputPath
 }
 
-# Setze Encoding für korrekte Umlaut-Darstellung
-$OutputEncoding = [System.Text.Encoding]::UTF8
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-$PSDefaultParameterValues['Out-File:Encoding'] = 'utf8'
-
 $progressPreference = 'Continue'
 
 # Prüfe und lade Exchange Management Shell
 function Initialize-ExchangeEnvironment {
     try {
-        # Prüfe, ob Exchange-Cmdlets verfügbar sind
         $exchangeSnapin = Get-PSSnapin -Name Microsoft.Exchange.Management.PowerShell.SnapIn -ErrorAction SilentlyContinue
         
         if ($null -eq $exchangeSnapin) {
-            # Versuche Exchange-Snapin zu laden
             Add-PSSnapin Microsoft.Exchange.Management.PowerShell.SnapIn -ErrorAction Stop
             Write-Host "Exchange Management Shell erfolgreich geladen." -ForegroundColor Green
         }
         
-        # Teste ob Exchange-Cmdlets verfügbar sind
         $null = Get-ExchangeServer -ErrorAction Stop
         return $true
     }
@@ -109,14 +107,11 @@ function Get-FolderPermissions {
             return $_.User.DisplayName -ne "Standard" -and $_.User.DisplayName -ne "Anonymous"
         }
         
-        # Hole die Berechtigungen
         $permissions = Get-PublicFolderClientPermission -Identity $Folder.EntryID -ErrorAction Stop | 
             Where-Object $permissionFilter |
             ForEach-Object {
-                # Verbesserte Benutzertyp-Erkennung
                 $userType = "Unbekannt"
                 try {
-                    # Versuche den Benutzer oder die Gruppe zu finden
                     $adObject = Get-User $_.User.DisplayName -ErrorAction SilentlyContinue
                     if ($adObject) {
                         $userType = "Benutzer"
@@ -156,32 +151,31 @@ function Get-FolderPermissions {
 function Generate-HTMLReport {
     param([array]$FolderData)
     
-    $css = @"
-    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background-color: #f5f5f5; }
-    .container { max-width: 1200px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    h1, h2 { color: #2c3e50; padding-bottom: 10px; }
-    h1 { border-bottom: 2px solid #3498db; }
-    .summary { background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
-    .folder { margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px; border-left: 4px solid #3498db; }
-    .folder-header { font-size: 1.2em; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
-    .folder-info { font-size: 0.9em; color: #666; margin-bottom: 10px; }
-    .permissions-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .permissions-table th { background-color: #3498db; color: white; padding: 8px; text-align: left; }
-    .permissions-table td { padding: 8px; border-bottom: 1px solid #ddd; }
-    .permissions-table tr:nth-child(even) { background-color: #f2f2f2; }
-    .no-permissions { color: #666; font-style: italic; padding: 10px; }
-    .timestamp { color: #666; font-size: 0.9em; margin-top: 20px; text-align: right; }
-    .search-box { margin: 20px 0; padding: 10px; }
-    .search-box input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
-"@
-
+    # HTML-Template mit korrekter UTF-8 Deklaration
     $html = @"
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <title>Exchange Public Folder Berechtigungen</title>
-    <style>$css</style>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background-color: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h1, h2 { color: #2c3e50; padding-bottom: 10px; }
+        h1 { border-bottom: 2px solid #3498db; }
+        .summary { background-color: #e8f4f8; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .folder { margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-radius: 5px; border-left: 4px solid #3498db; }
+        .folder-header { font-size: 1.2em; font-weight: bold; color: #2c3e50; margin-bottom: 10px; }
+        .folder-info { font-size: 0.9em; color: #666; margin-bottom: 10px; }
+        .permissions-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .permissions-table th { background-color: #3498db; color: white; padding: 8px; text-align: left; }
+        .permissions-table td { padding: 8px; border-bottom: 1px solid #ddd; }
+        .permissions-table tr:nth-child(even) { background-color: #f2f2f2; }
+        .no-permissions { color: #666; font-style: italic; padding: 10px; }
+        .timestamp { color: #666; font-size: 0.9em; margin-top: 20px; text-align: right; }
+        .search-box { margin: 20px 0; padding: 10px; }
+        .search-box input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
     <script>
     function searchFolders() {
         const input = document.getElementById('searchInput').value.toLowerCase();
@@ -262,7 +256,6 @@ function Generate-HTMLReport {
 
 # Hauptskript
 try {
-    # Prüfe Exchange-Umgebung
     if (-not (Initialize-ExchangeEnvironment)) {
         throw "Exchange-Umgebung konnte nicht initialisiert werden."
     }
@@ -291,7 +284,10 @@ try {
     
     Write-Host "Erstelle HTML-Report..."
     $htmlReport = Generate-HTMLReport -FolderData $folderPermissions
-    $htmlReport | Out-File -FilePath $reportPath -Encoding UTF8
+    
+    # Schreibe HTML mit BOM
+    $htmlBytes = $BOM.GetBytes($htmlReport)
+    [System.IO.File]::WriteAllBytes($reportPath, $htmlBytes)
     
     Write-Host "Report wurde erfolgreich erstellt: $reportPath" -ForegroundColor Green
 }
